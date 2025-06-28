@@ -1,0 +1,2 @@
+---
+server_greeting: "This is a web server managed by Ansible!"

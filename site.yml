@@ -1,0 +1,21 @@
+---
+- name: Prepare all hosts for Ansible
+  hosts: all
+  gather_facts: false
+  pre_tasks:
+    - name: Update apt cache and install python3
+      raw: apt-get update && apt-get install -y python3
+- name: Apply common configuration to all hosts
+  hosts: all
+  roles:
+    - common
+
+- name: Configure web servers
+  hosts: webservers
+  roles:
+    - nginx
+
+- name: Configure load balancer
+  hosts: loadbalancer
+  roles:
+    - nginx

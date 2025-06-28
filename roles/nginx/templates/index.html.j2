@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome!</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background-color: #f0f0f0; padding-top: 50px; }
+        div { background-color: white; border: 1px solid #ccc; border-radius: 8px; display: inline-block; padding: 20px 40px; }
+        h1 { color: #333; }
+        p { color: #555; }
+        span { font-weight: bold; color: #007bff; }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>{{ server_greeting }}</h1>
+        <p>You have connected to host: <span>{{ inventory_hostname }}</span></p>
+    </div>
+</body>
+</html>

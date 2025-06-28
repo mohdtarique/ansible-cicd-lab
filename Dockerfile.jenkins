@@ -1,0 +1,28 @@
+# Use a trusted Jenkins LTS image as our base
+FROM jenkins/jenkins:lts-jdk11
+
+# Switch to the root user to install software
+USER root
+
+# Install common dependencies
+RUN apt-get update && apt-get install -y curl gnupg lsb-release software-properties-common
+
+# Add Ansible PPA correctly and install Ansible
+RUN echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu focal main" | tee /etc/apt/sources.list.d/ansible.list
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
+RUN apt-get update
+RUN apt-get install -y ansible
+
+# Install Docker CLI
+RUN curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+RUN apt-get update
+RUN apt-get install -y docker-ce-cli
+RUN apt-get install -y python3
+
+
+# Create a docker group with the GID passed from the host, then add the jenkins user to it.
+# This ensures the jenkins user has the correct permissions on the docker.sock file.
+RUN groupadd -g ${DOCKER_GID:-999} docker && usermod -aG docker jenkins
+# Switch back to the non-privileged jenkins user
+USER jenkins

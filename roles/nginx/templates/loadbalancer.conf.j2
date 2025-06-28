@@ -1,0 +1,16 @@
+# /etc/nginx/sites-available/default
+# No resolver needed when using a custom docker network
+
+upstream webservers {
+    {% for host in groups['webservers'] %}
+    server {{ host }};
+    {% endfor %}
+}
+
+server {
+    listen {{ nginx_port }};
+
+    location / {
+        proxy_pass http://webservers;
+    }
+}

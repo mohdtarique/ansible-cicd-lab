@@ -1,0 +1,24 @@
+---
+- name: Install Nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+
+- name: Template the load balancer config
+  ansible.builtin.template:
+    src: loadbalancer.conf.j2
+    dest: /etc/nginx/sites-available/default
+  when: "'loadbalancer' in group_names"
+  notify: Restart Nginx
+
+- name: Template the web server index page
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+  when: "'webservers' in group_names"
+
+- name: Ensure Nginx is running and enabled at boot
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: yes
