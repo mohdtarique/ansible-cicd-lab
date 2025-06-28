@@ -10,6 +10,8 @@ pipeline {
                 sh 'echo "Starting Ansible deployment..."'
                 sh 'ansible --version'
                 sh 'docker --version'
+                sh 'trivy --version'
+                sh 'ansible-lint --version'
             }
         }
 
