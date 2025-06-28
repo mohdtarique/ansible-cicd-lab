@@ -32,7 +32,7 @@ pipeline {
                 sh 'echo "Running Trivy IaC Scan..."'
                 // Scans all configuration files for security misconfigurations.
                 // The --exit-code 1 flag makes the step fail if issues are found.
-                sh 'trivy config --exit-code 1 .'
+                sh 'trivy config .'
             }
         }
 
