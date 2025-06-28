@@ -140,3 +140,11 @@ The `Jenkinsfile` defines the following stages:
 3.  **Security Scan:** Uses `trivy config` to scan all Infrastructure as Code files for security misconfigurations. The pipeline is configured with a custom threshold: it will only fail if Trivy finds `CRITICAL` issues in more than two files.
 4.  **Run Ansible Playbook:** If all previous checks pass, this stage executes the main `site.yml` playbook, which provisions and configures the running containers.
 5.  **Verify Deployment:** A final smoke test that runs `curl` against the load balancer to confirm that the environment is up and serving requests.
+
+---
+
+## Final Result Screenshot
+
+After the pipeline completes successfully, the load balancer is accessible at `http://localhost:8080` from your local machine. It will route traffic to the two web servers (`web01` and `web02`). Refreshing the page will alternate the "You have connected to host" message between the two servers.
+
+![Screenshot of the final running application](https://storage.googleapis.com/project-1-1444012133933.appspot.com/uploaded:image_fb99ba.png-ccb21879-2dc5-4839-8857-814d96e8452a)
