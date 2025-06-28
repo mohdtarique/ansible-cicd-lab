@@ -147,4 +147,5 @@ The `Jenkinsfile` defines the following stages:
 
 After the pipeline completes successfully, the load balancer is accessible at `http://localhost:8080` from your local machine. It will route traffic to the two web servers (`web01` and `web02`). Refreshing the page will alternate the "You have connected to host" message between the two servers.
 
-![Screenshot of the final running application](https://storage.googleapis.com/project-1-1444012133933.appspot.com/uploaded:image_fb99ba.png-ccb21879-2dc5-4839-8857-814d96e8452a)
+<img width="961" alt="image" src="https://github.com/user-attachments/assets/5576c48a-dce7-49ea-bf98-f0d3b89d1eff" />
+
