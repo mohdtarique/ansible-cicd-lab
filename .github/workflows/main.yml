@@ -10,7 +10,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Docker Network
       run: docker network create ansible-network
@@ -26,7 +26,7 @@ jobs:
         docker run --rm --network ansible-network \
         -v ${{ github.workspace }}:/ansible \
         -w /ansible \
-        ansible/ansible-runner:latest \
+        quay.io/ansible/ansible-runner \
         ansible-playbook -i inventory.ini site.yml
 
     - name: Verify Deployment
