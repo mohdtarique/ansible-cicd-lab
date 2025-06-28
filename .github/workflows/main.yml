@@ -1,0 +1,39 @@
+name: Ansible CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Network
+      run: docker network create ansible-network
+
+    - name: Run target containers
+      run: |
+        docker run -d --name web01 --network ansible-network debian:bullseye-slim sleep 3600
+        docker run -d --name web02 --network ansible-network debian:bullseye-slim sleep 3600
+        docker run -d --name lb01 --network ansible-network -p 8080:80 debian:bullseye-slim sleep 3600
+
+    - name: Run Ansible Playbook
+      run: |
+        docker run --rm --network ansible-network \
+        -v ${{ github.workspace }}:/ansible \
+        -w /ansible \
+        ansible/ansible-runner:latest \
+        ansible-playbook -i inventory.ini site.yml
+
+    - name: Verify Deployment
+      run: |
+        echo "Waiting for services to be available..."
+        sleep 10
+        echo "Running verification tests..."
+        curl --fail http://localhost:8080
+        curl --fail http://localhost:8080
+        curl --fail http://localhost:8080
