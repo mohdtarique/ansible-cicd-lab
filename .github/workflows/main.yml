@@ -1,4 +1,4 @@
-name: Ansible CI/CD Pipeline
+name: Self-Hosted Ansible CI/CD
 
 on:
   push:
@@ -6,14 +6,20 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    # This is the key change: it tells GitHub to send this job to a runner
+    # that has BOTH the "self-hosted" and "hostalien" labels.
+    runs-on: [self-hosted, hostalien]
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up Docker Network
-      run: docker network create ansible-network
+    - name: Clean up old resources and Set up Network
+      run: |
+        docker stop web01 web02 lb01 || true
+        docker rm web01 web02 lb01 || true
+        docker network rm ansible-network || true
+        docker network create ansible-network
 
     - name: Run target containers
       run: |
@@ -21,26 +27,18 @@ jobs:
         docker run -d --name web02 --network ansible-network debian:bullseye-slim sleep 3600
         docker run -d --name lb01 --network ansible-network -p 8080:80 debian:bullseye-slim sleep 3600
 
-    - name: Install collection and Run Ansible Playbook
+    - name: Run Ansible Playbook Directly on Runner
       run: |
-        docker run --rm --network ansible-network \
-        -v ${{ github.workspace }}:/ansible \
-        -w /ansible \
-        quay.io/ansible/ansible-runner \
-        sh -c "ansible-galaxy collection install community.docker && ansible-playbook -i inventory.ini site.yml"
+        # We can run ansible-playbook directly because it's installed on the runner (your WSL system).
+        # We don't need to use a separate ansible-runner container.
+        ANSIBLE_CONFIG=ansible.cfg ansible-playbook -i inventory.ini site.yml
 
-    - name: Verify Deployment from within the Runner
+    - name: Verify Deployment
       run: |
-        echo "The application is running inside the GitHub Actions runner."
-        echo "The following 'curl' commands test the load balancer from within that environment."
-        echo "This URL is NOT accessible from your local browser."
-        echo "-----------------------------------------------------"
+        echo "Waiting for services to be available..."
         sleep 10
-        echo "Running verification test 1..."
+        echo "Running verification tests..."
+        curl --fail http://localhost:8080
         curl --fail http://localhost:8080
         echo
-        echo "Running verification test 2..."
-        curl --fail http://localhost:8080
-        echo
-        echo "-----------------------------------------------------"
         echo "Verification successful!"
